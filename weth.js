@@ -160,7 +160,7 @@ Terima kasih atas perhatian Anda. Jika ada pertanyaan atau masalah, jangan ragu 
 
 function scheduleTask() {
   const timezone = config.timezone || "Asia/Jakarta";
-  const scheduledTime = config.scheduledTime || "07:00";
+  const scheduledTime = config.scheduledTime || "08:10";
   const [scheduledHour, scheduledMinute] = scheduledTime.split(":").map(Number);
 
   console.log(`[${getCurrentServerTime()}] Current configuration:`);
@@ -176,31 +176,35 @@ function scheduleTask() {
     `[${getCurrentServerTime()}] Scheduling task to run at ${scheduledTime} ${timezone}`
   );
 
-  const job = schedule.scheduleJob(
-    { hour: scheduledHour, minute: scheduledMinute, tz: timezone },
-    function () {
-      console.log(`[${getCurrentServerTime()}] Starting scheduled task...`);
-      main().catch(console.error);
-    }
-  );
-
-  console.log(
-    `[${getCurrentServerTime()}] Task scheduled. Waiting for execution time...`
-  );
-
   const now = moment().tz(timezone);
   const nextExecution = moment()
     .tz(timezone)
     .set({ hour: scheduledHour, minute: scheduledMinute });
-  if (nextExecution.isBefore(now)) {
-    nextExecution.add(1, "day");
+
+  // Jika waktu sekarang sudah lewat dari waktu yang dijadwalkan, jalankan segera
+  if (now.isAfter(nextExecution)) {
+    console.log(`[${getCurrentServerTime()}] Scheduled time (${scheduledTime}) has passed. Running task immediately...`);
+    main().catch(console.error);
+  } else {
+    const job = schedule.scheduleJob(
+      { hour: scheduledHour, minute: scheduledMinute, tz: timezone },
+      function () {
+        console.log(`[${getCurrentServerTime()}] Starting scheduled task...`);
+        main().catch(console.error);
+      }
+    );
+
+    console.log(
+      `[${getCurrentServerTime()}] Task scheduled. Waiting for execution time...`
+    );
+
+    const timeUntilExecution = nextExecution.diff(now);
+    console.log(
+      `Next execution will be in approximately ${moment
+        .duration(timeUntilExecution)
+        .humanize()}`
+    );
   }
-  const timeUntilExecution = nextExecution.diff(now);
-  console.log(
-    `Next execution will be in approximately ${moment
-      .duration(timeUntilExecution)
-      .humanize()}`
-  );
 }
 
 scheduleTask();
