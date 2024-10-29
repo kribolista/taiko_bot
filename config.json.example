@@ -18,10 +18,12 @@
         "amount_max": "0.003"
       }
     }
-  },
+ },
   "vote": {
-    "iterations": 75,
+    "iterations": 2,
     "interval": 1,
-    "gasPrice": "0.14"
+    "baseFee": "0.000000001",
+    "maxFee": "0.15",
+    "maxPriorityFee": "0.11"
   }
 }
