@@ -23,7 +23,7 @@
     "iterations": 2,
     "interval": 1,
     "baseFee": "0.000000001",
-    "maxFee": "0.15",
+    "maxFee": "0.25",
     "maxPriorityFee": "0.11"
   }
 }
